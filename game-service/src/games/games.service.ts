@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service.js';
-import { Prisma } from '@prisma/client';
+import { CreateGameDto, UpdateGameDto } from './model/GameDto.js';
 
 @Injectable()
 export class GamesService {
   constructor(private readonly databaseService: DatabaseService) {}
 
-  async create(createGameDto: Prisma.GameCreateInput) {
+  async create(createGameDto: CreateGameDto) {
     return this.databaseService.game.create({ data: createGameDto });
   }
 
@@ -22,7 +22,7 @@ export class GamesService {
     });
   }
 
-  update(id: string, updateGameDto: Prisma.GameUpdateInput) {
+  update(id: string, updateGameDto: UpdateGameDto) {
     return this.databaseService.game.update({
       where: {
         id,
