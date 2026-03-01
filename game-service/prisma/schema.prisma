@@ -19,6 +19,8 @@ model Game {
   name          String        @map("game_name") @db.VarChar(255)
   description   String        @db.VarChar(255)
   runCategories RunCategory[]
+
+  @@map("games")
 }
 
 model RunCategory {
@@ -27,4 +29,6 @@ model RunCategory {
   name    String @map("run_category_name") @db.VarChar(255)
 
   game Game @relation(fields: [game_id], references: [id])
+
+  @@map("run_categories")
 }
