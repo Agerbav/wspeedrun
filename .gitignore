@@ -1,7 +1,4 @@
-#other services 
-/run-service
-/auth-service
-
+@ -0,0 +1,58 @@
 # compiled output
 /dist
 /node_modules
