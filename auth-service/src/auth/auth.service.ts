@@ -23,9 +23,6 @@ export class AuthService {
       throw new ConflictException('Email already exists');
     }
 
-    // Note: Bcrypt produces a 60-character hash. 
-    // Since the schema is VarChar(55), this will be truncated in the DB, 
-    // which will cause authentication to fail.
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await this.databaseService.user.create({
