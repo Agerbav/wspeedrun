@@ -15,10 +15,9 @@ export class RunsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('USER', 'ADMIN')
   @Post()
-  @ApiOperation({ summary: 'Create a new run' })
+  @ApiOperation({ summary: 'Create new run entry' })
   @ApiBody({ type: CreateRunDto })
-  @ApiResponse({ status: 201, description: 'The run has been successfully created.' })
-  @ApiResponse({ status: 400, description: 'Bad Request' })
+  @ApiResponse({ status: 201, description: 'The run entry has been successfully created.' })
   create(@Body() createRunDto: CreateRunDto, @Request() req) {
     const runData = {
       ...createRunDto,
@@ -27,18 +26,25 @@ export class RunsController {
     return this.runsService.create(runData);
   }
 
-  @Get()
-  @ApiOperation({ summary: 'Get all runs' })
-  @ApiResponse({ status: 200, description: 'Return all runs.' })
-  findAll() {
-    return this.runsService.findAll();
+  @Get(':id/category')
+  @ApiOperation({ summary: 'List of all runs by run category' })
+  @ApiParam({ name: 'id', description: 'The category ID' })
+  findByCategory(@Param('id') id: string) {
+    return this.runsService.findByCategory(id);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Get(':id/user')
+  @ApiOperation({ summary: 'List of all runs by user' })
+  @ApiParam({ name: 'id', description: 'The user ID' })
+  findByUser(@Param('id') id: string, @Request() req) {
+    return this.runsService.findByUser(id, req.user);
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get a specific run by ID' })
+  @ApiOperation({ summary: "Get run's details" })
   @ApiParam({ name: 'id', description: 'The run ID' })
-  @ApiResponse({ status: 200, description: 'Return the specific run.' })
-  @ApiResponse({ status: 404, description: 'Run not found.' })
   findOne(@Param('id') id: string) {
     return this.runsService.findOne(id);
   }
@@ -47,11 +53,6 @@ export class RunsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   @Patch(':id')
-  @ApiOperation({ summary: 'Update a specific run' })
-  @ApiParam({ name: 'id', description: 'The run ID' })
-  @ApiBody({ type: UpdateRunDto })
-  @ApiResponse({ status: 200, description: 'The run has been successfully updated.' })
-  @ApiResponse({ status: 404, description: 'Run not found.' })
   update(@Param('id') id: string, @Body() updateRunDto: UpdateRunDto) {
     return this.runsService.update(id, updateRunDto);
   }
@@ -60,10 +61,6 @@ export class RunsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete a specific run' })
-  @ApiParam({ name: 'id', description: 'The run ID' })
-  @ApiResponse({ status: 200, description: 'The run has been successfully deleted.' })
-  @ApiResponse({ status: 404, description: 'Run not found.' })
   remove(@Param('id') id: string) {
     return this.runsService.remove(id);
   }
