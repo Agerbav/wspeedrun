@@ -80,12 +80,29 @@ export class RunsService {
 
   async findByUser(targetUserId: string, authUser: any) {
     const filter = { user_id: targetUserId } as any;
-    
     if (authUser.userId !== targetUserId) {
       filter.status = 'ACCEPTED';
     }
-
     return this.databaseService.run.findMany({ where: filter });
+  }
+
+  async findByStatus(status: string) {
+    return this.databaseService.run.findMany({
+      where: { status: status.toUpperCase() }
+    });
+  }
+
+  async updateStatus(id: string, status: string) {
+    const run = await this.databaseService.run.findUnique({ where: { id } });
+    if (!run) throw new NotFoundException('Run not found');
+
+    return this.databaseService.run.update({
+      where: { id },
+      data: { 
+        status: status.toUpperCase(),
+        verified_at: status.toUpperCase() === 'ACCEPTED' ? new Date() : null
+      }
+    });
   }
 
   async findOne(id: string) {
