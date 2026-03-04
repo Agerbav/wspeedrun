@@ -1,6 +1,5 @@
 import {
   Controller,
-  Get,
   Post,
   Body,
   Patch,
@@ -18,16 +17,16 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 
-@ApiTags('run-categories')
-@Controller('run-categories')
+@ApiTags('admin-categories')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('ADMIN')
+@Controller('admin/categories')
 export class RunCategoriesController {
   constructor(private readonly runCategoriesService: RunCategoriesService) {}
 
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
   @Post()
-  @ApiOperation({ summary: 'Create a new run category' })
+  @ApiOperation({ summary: 'Create a new run category record' })
   @ApiBody({ type: CreateRunCategoryDto, required: true })
   @ApiResponse({
     status: 201,
@@ -37,26 +36,8 @@ export class RunCategoriesController {
     return this.runCategoriesService.create(createRunCategoryDto);
   }
 
-  @Get()
-  @ApiOperation({ summary: 'Get all run categories' })
-  @ApiResponse({ status: 200, description: 'Return all run categories.' })
-  findAll() {
-    return this.runCategoriesService.findAll();
-  }
-
-  @Get(':id')
-  @ApiOperation({ summary: 'Get a run category by ID' })
-  @ApiResponse({ status: 200, description: 'Return a run category.' })
-  @ApiResponse({ status: 404, description: 'Run category not found.' })
-  findOne(@Param('id') id: string) {
-    return this.runCategoriesService.findOne(id);
-  }
-
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
-  @Patch(':id')
-  @ApiOperation({ summary: 'Update a run category by ID' })
+  @Patch(':id/update')
+  @ApiOperation({ summary: "Update run category's details" })
   @ApiBody({ type: UpdateRunCategoryDto, required: true })
   @ApiResponse({
     status: 200,
@@ -70,11 +51,8 @@ export class RunCategoriesController {
     return this.runCategoriesService.update(id, updateRunCategoryDto);
   }
 
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('ADMIN')
-  @Delete(':id')
-  @ApiOperation({ summary: 'Delete a run category by ID' })
+  @Delete(':id/delete')
+  @ApiOperation({ summary: 'Delete run category' })
   @ApiResponse({
     status: 200,
     description: 'The run category has been successfully deleted.',
