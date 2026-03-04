@@ -6,19 +6,26 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBody, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBody, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { RunCategoriesService } from './run_categories.service';
 import {
   CreateRunCategoryDto,
   UpdateRunCategoryDto,
 } from './model/RunCategoryDto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
 
 @ApiTags('run-categories')
 @Controller('run-categories')
 export class RunCategoriesController {
   constructor(private readonly runCategoriesService: RunCategoriesService) {}
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
   @Post()
   @ApiOperation({ summary: 'Create a new run category' })
   @ApiBody({ type: CreateRunCategoryDto, required: true })
@@ -45,6 +52,9 @@ export class RunCategoriesController {
     return this.runCategoriesService.findOne(id);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
   @Patch(':id')
   @ApiOperation({ summary: 'Update a run category by ID' })
   @ApiBody({ type: UpdateRunCategoryDto, required: true })
@@ -60,6 +70,9 @@ export class RunCategoriesController {
     return this.runCategoriesService.update(id, updateRunCategoryDto);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a run category by ID' })
   @ApiResponse({
