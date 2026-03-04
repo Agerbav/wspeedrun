@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { PassportModule } from '@nestjs/passport';
+import { JwtStrategy } from './auth/jwt.strategy';
 
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
@@ -13,11 +15,12 @@ import { GamesModule } from './games/games.module.js';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    PassportModule,
     DatabaseModule,
     GamesModule,
     RunCategoriesModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, JwtStrategy],
 })
 export class AppModule {}
