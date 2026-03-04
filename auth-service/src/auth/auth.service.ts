@@ -40,6 +40,19 @@ export class AuthService {
     };
   }
 
+  async getProfile(id: string) {
+    const user = await this.databaseService.user.findUnique({
+      where: { id },
+      select: {
+        username: true,
+        email: true,
+        country: true,
+        role: true,
+      },
+    });
+    return user;
+  }
+
   async login(loginDto: LoginDto) {
     const { email, password } = loginDto;
 
