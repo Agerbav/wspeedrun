@@ -1,35 +1,43 @@
-import { Injectable } from '@nestjs/common';
-import { CreateCommentDto, UpdateCommentDto } from './models/CommentDto';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { CreateCommentDto } from './models/CommentDto';
 import { DatabaseService } from 'src/database/database.service';
 
 @Injectable()
 export class CommentsService {
   constructor(private readonly databaseService: DatabaseService) {}
 
-  async create(createCommentDto: CreateCommentDto) {
-    return this.databaseService.comment.create({ data: createCommentDto });
-  }
+  async create(createCommentDto: CreateCommentDto, userId: string) {
+    const run = await this.databaseService.run.findUnique({
+      where: { id: createCommentDto.run_id },
+    });
 
-  async findAll() {
-    return this.databaseService.comment.findMany({});
-  }
+    if (!run) {
+      throw new NotFoundException(`Run with ID ${createCommentDto.run_id} not found`);
+    }
 
-  async findOne(id: string) {
-    return this.databaseService.comment.findUnique({
-      where: {
-        id,
+    return this.databaseService.comment.create({
+      data: {
+        ...createCommentDto,
+        user_id: userId,
       },
     });
   }
 
-  async update(id: string, updateCommentDto: UpdateCommentDto) {
-    return this.databaseService.comment.update({
+  async remove(id: string, userId: string) {
+    const comment = await this.databaseService.comment.findUnique({
       where: { id },
-      data: updateCommentDto,
     });
-  }
 
-  async remove(id: string) {
-    return this.databaseService.comment.delete({ where: { id } });
+    if (!comment) {
+      throw new NotFoundException('Comment not found');
+    }
+
+    if (comment.user_id !== userId) {
+      throw new ForbiddenException('You can only delete your own comments');
+    }
+
+    return this.databaseService.comment.delete({
+      where: { id },
+    });
   }
 }
